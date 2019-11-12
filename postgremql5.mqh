@@ -15,3 +15,5 @@ string pmql_exec(string query);
 
 void pmql_delimiters(int val_delim, int col_delim, int row_delim);
 void pmql_set_cache_size(int max_cache_size);
+
+#import

@@ -60,7 +60,7 @@ bool prepare_db()
     return (false);
 }
 
-int init()
+int OnInit()
 {
     string res = pmql_connect(g_db_ip_setting, g_db_port_setting, g_db_user_setting, g_db_password_setting, g_db_name_setting);
     if ((res != "ok") && (res != "already connected"))
@@ -75,17 +75,17 @@ int init()
     return(0);
 }
 
-int deinit()
+int OnDeinit()
 {
     pmql_disconnect();
     return(0);
 }
 
-int start()
+void OnTick()
 {
-    string time = TimeToStr(TimeCurrent(), TIME_DATE | TIME_SECONDS);
-    time = StringSetChar(time, 4, '-');
-    time = StringSetChar(time, 7, '-');
+    string time = TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS);
+    StringSetCharacter(time, 4, '-');
+    StringSetCharacter(time, 7, '-');
     
     int ms = GetTickCount();
     if (ms < 0) ms = (-1 * ms);
@@ -97,11 +97,12 @@ int start()
 
     time = time + "." + ms_str;
 
-    string query = "INSERT INTO \"" + Symbol() + "\" (timestamp, bid, ask) VALUES ('" + time + g_timezone_setting + "', " + DoubleToStr(NormalizeDouble(Bid, 5), 5) + ", " + DoubleToStr(NormalizeDouble(Ask, 5), 5) + ")";
+    double Ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+    double Bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+
+    string query = "INSERT INTO \"" + Symbol() + "\" (timestamp, bid, ask) VALUES ('" + time + g_timezone_setting + "', " + DoubleToString(NormalizeDouble(Bid, 5), 5) + ", " + DoubleToString(NormalizeDouble(Ask, 5), 5) + ")";
     string res = pmql_exec(query);
 
     if (is_error(res))
         Print(res);
-
-    return(0);
 }
